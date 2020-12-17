@@ -6,24 +6,30 @@ from openpyxl import Workbook
 import string
 import tkinter as tk
 from tkcalendar import Calendar
-from tkinter  import Listbox, ttk
+from tkinter  import Listbox, StringVar, ttk
 
 
 staffList=[]
 def gui():
+   
    #TODO create gui
    window = tk.Tk()
    window.title("E-Roster")
    window.geometry("800x400") 
 
    #* date frame
-   dateFrame = tk.LabelFrame(window,text = "Select Date")
+   dateFrame = tk.LabelFrame(window,text = "1: Select Date")
    dateFrame.pack(fill="both", expand="yes", side=tk.LEFT)
 
    calendar = Calendar(dateFrame,selectmode="day")
    calendar.pack(fill = "both",padx = 10,pady =10)
 
+   errormsg = StringVar()
+   errorlabel = tk.Label(dateFrame,textvariable= errormsg, fg = "red")
+   
    def generateStaff(house):
+      global staffList
+      
       if(house in "Daisy"):
          staffList = ["EN JUDIT","NA SYLVIA -I/C","NA EVANNY-I/C","NA SUKHWINDER-I/C","NA MARY ANN- I/C","NA RINI","SCHA NERISA"]
       elif(house in "Daffoldil"):
@@ -39,18 +45,27 @@ def gui():
       for i in staffList:
          listBox.insert(0,i) 
 
-   def getDate():
-      print(calendar.get_date())
-      print(staffList)
+      
 
+   def getDate():
+      print(staffList)
+      if not staffList:
+         errormsg.set( "Please select a house")
+         errorlabel.pack()
+      else:
+         errormsg.set("Table genrated")
+         errorlabel.configure(foreground="green")
+         errorlabel.pack()
+         select_date = datetime.datetime.strptime(calendar.get_date(),"%m/%d/%y").strftime("%d-%m-%Y")
+         print(select_date)
+         #startRoster(calendar.getDate(),staffList)
 
    bt_submit = tk.Button(window, text="Generate Table", command= getDate)
    bt_submit.pack(side = tk.BOTTOM, fill = "both", expand = False)
 
    #* staff frame
-   
 
-   houseFrame = tk.LabelFrame(window, text="House")
+   houseFrame = tk.LabelFrame(window, text="2: House")
    houseFrame.pack(fill = "both",expand = "yes",side= tk.LEFT)
 
 
@@ -76,10 +91,10 @@ def gui():
 
 
 
-def startRoster(date):
+def startRoster(date,staffList):
    
    roster = {}
-   staffa= ["Mark", "Amber", "Todd", "Anita", "Sandy","john","kent"]
+   staffa= staffList
    staff = list.copy(staffa)
    random.shuffle(staff)
    t_staff = []
